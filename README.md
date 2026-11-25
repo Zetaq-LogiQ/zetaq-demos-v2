@@ -24,15 +24,15 @@ Each demo runs in the browser (phone or computer); no login, no server.
 | Plant Explorer | Biology · 3D | [open](https://zetaq-logiq.github.io/zetaq-demos-v2/play.html?d=plant-explorer) · [direct](https://zetaq-logiq.github.io/zetaq-demos-v2/items/plant-explorer/index.html) |
 | Cell Atlas | Biology · 3D | [open](https://zetaq-logiq.github.io/zetaq-demos-v2/play.html?d=cell-atlas) · [direct](https://zetaq-logiq.github.io/zetaq-demos-v2/items/cell-atlas/index.html) |
 | Plant Lab | Class 7 · Science | [open](https://zetaq-logiq.github.io/zetaq-demos-v2/play.html?d=plant-lab) · [direct](https://zetaq-logiq.github.io/zetaq-demos-v2/items/plant-lab/index.html) |
-| Breathing Model | Class 7 · Science | [open](https://zetaq-logiq.github.io/zetaq-demos-v2/play.html?d=breathing-model) · [direct](https://zetaq-logiq.github.io/zetaq-demos-v2/items/breathing-model/index.html) |
+| Neutrophil Chase | Class 8 · Science | [open](https://zetaq-logiq.github.io/zetaq-demos-v2/play.html?d=neutrophil) · [direct](https://zetaq-logiq.github.io/zetaq-demos-v2/items/neutrophil/index.html) |
 
 ## Physics Lab
 
 | Demo | Class / subject | Open |
 |---|---|---|
 | Optics Lab | Physics · 3D | [open](https://zetaq-logiq.github.io/zetaq-demos-v2/play.html?d=optics-lab) · [direct](https://zetaq-logiq.github.io/zetaq-demos-v2/items/optics-lab/index.html) |
-| Electric Circuit | Class 7 · Science | [open](https://zetaq-logiq.github.io/zetaq-demos-v2/play.html?d=circuit) · [direct](https://zetaq-logiq.github.io/zetaq-demos-v2/items/circuit/index.html) |
-| Lemon Cell and Dry Cell | Class 8 · Science | [open](https://zetaq-logiq.github.io/zetaq-demos-v2/play.html?d=lemon-cell) · [direct](https://zetaq-logiq.github.io/zetaq-demos-v2/items/lemon-cell/index.html) |
+| Circuit Lab | Physics · 3D | [open](https://zetaq-logiq.github.io/zetaq-demos-v2/play.html?d=circuit-lab) · [direct](https://zetaq-logiq.github.io/zetaq-demos-v2/items/circuit-lab/index.html) |
+| Electromagnet Bench | Class 8 · Science | [open](https://zetaq-logiq.github.io/zetaq-demos-v2/play.html?d=electromagnet) · [direct](https://zetaq-logiq.github.io/zetaq-demos-v2/items/electromagnet/index.html) |
 
 ## Chemistry Lab
 

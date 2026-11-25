@@ -1,0 +1,2 @@
+ZetaQ interactive lesson. Art, 3D scenes, music and narration made by ZetaQ (art drawn in code).
+Software: three.js (MIT licence).

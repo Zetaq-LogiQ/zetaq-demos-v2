@@ -1,2 +1,0 @@
-3D model, steps and texts built in code by ZetaQ (ZetaQ Device Lab). Sounds are made in the page.
-Software: three.js r170 (MIT licence, Copyright 2010-2024 Three.js Authors).

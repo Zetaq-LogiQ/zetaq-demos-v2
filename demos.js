@@ -18,11 +18,11 @@ window.ZQ_DEMOS = [
   { slug: 'plant-explorer', group: 'biology', title: 'Plant Explorer', chip: 'Biology · 3D' },
   { slug: 'cell-atlas', group: 'biology', title: 'Cell Atlas', chip: 'Biology · 3D' },
   { slug: 'plant-lab', group: 'biology', title: 'Plant Lab', chip: 'Class 7 · Science' },
-  { slug: 'breathing-model', group: 'biology', title: 'Breathing Model', chip: 'Class 7 · Science' },
+  { slug: 'neutrophil', group: 'biology', title: 'Neutrophil Chase', chip: 'Class 8 · Science' },
 
   { slug: 'optics-lab', group: 'physics', title: 'Optics Lab', chip: 'Physics · 3D' },
-  { slug: 'circuit', group: 'physics', title: 'Electric Circuit', chip: 'Class 7 · Science' },
-  { slug: 'lemon-cell', group: 'physics', title: 'Lemon Cell and Dry Cell', chip: 'Class 8 · Science' },
+  { slug: 'circuit-lab', group: 'physics', title: 'Circuit Lab', chip: 'Physics · 3D' },
+  { slug: 'electromagnet', group: 'physics', title: 'Electromagnet Bench', chip: 'Class 8 · Science' },
 
   { slug: 'chem-lab', group: 'chemistry', title: 'Chemistry Lab', chip: 'Chemistry · 3D' },
   { slug: 'changes-lab', group: 'chemistry', title: 'Changes Lab', chip: 'Class 7 · Science' },

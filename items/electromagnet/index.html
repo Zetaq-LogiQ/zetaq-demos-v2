@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Electromagnet Bench</title>
+<style>
+:root{--bg:#0b111a;--panel:#111a27;--panel2:#18243552;--p2:#182435;--line:#2a3b52;--fg:#e9eff6;--mut:#97a8bc;--acc:#3fd2c7;--acc2:#5aa8ff;--gold:#ffd25a;--red:#ff6b6b;--r:14px}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%;background:var(--bg);color:var(--fg);font:15px/1.35 "Segoe UI",system-ui,-apple-system,Roboto,sans-serif;overflow:hidden;touch-action:none}
+button{font:inherit;color:inherit;cursor:pointer;border:0}
+button:disabled{cursor:default}
+#app{position:fixed;inset:0;display:flex;flex-direction:column}
+#stage{position:relative;flex:1;min-height:0}
+#cv{position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:none}
+#top{position:absolute;left:0;right:0;top:0;display:flex;gap:8px;align-items:flex-start;padding:10px 10px 0;pointer-events:none}
+#top>*{pointer-events:auto}
+.brand{font-weight:800;letter-spacing:.3px;font-size:15px;padding:8px 12px;border-radius:12px;background:rgba(10,16,26,.8);border:1px solid var(--line);white-space:nowrap}
+.brand b{color:var(--acc)}
+#taskCard{flex:1;min-width:0;background:rgba(10,16,26,.86);border:1px solid var(--line);border-radius:12px;padding:7px 10px;display:flex;gap:8px;align-items:center}
+#taskTxt{flex:1;min-width:0;font-size:13.5px;cursor:pointer}
+#taskTxt small{display:block;color:var(--mut);font-size:12px}
+.ib{min-width:40px;min-height:40px;border-radius:11px;background:var(--p2);border:1px solid var(--line);font-weight:700;font-size:13px;padding:0 10px}
+#readout{position:absolute;left:10px;top:64px;background:rgba(10,16,26,.82);border:1px solid var(--line);border-radius:12px;padding:6px 10px;font-size:13px;pointer-events:none;line-height:1.45}
+#readout b{color:var(--gold)}
+#readout .on{color:#7dffcf;font-weight:700}#readout .off{color:#ff9a9a;font-weight:700}
+#clipBadge{position:absolute;right:10px;top:64px;background:rgba(10,16,26,.86);border:1px solid #2f6a63;border-radius:12px;padding:6px 12px;text-align:center;pointer-events:none}
+#clipBadge small{display:block;color:var(--mut);font-size:11.5px}
+#clipBadge b{font-size:26px;color:#7dffcf;font-variant-numeric:tabular-nums}
+#toast{position:absolute;left:50%;bottom:12px;transform:translateX(-50%);width:min(94%,560px);background:#0f2a26;border:1px solid #2a8a7c;color:#dafff8;padding:9px 14px;border-radius:12px;font-size:14px;opacity:0;transition:opacity .25s;pointer-events:none;z-index:5;text-align:center}
+#toast.bad{background:#2a1416;border-color:#8a3a3a;color:#ffe2de}
+#panel{background:var(--panel);border-top:1px solid var(--line);padding:8px 10px calc(10px + env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:7px}
+.tabs{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.tab{min-height:40px;border-radius:11px;background:var(--p2);border:1px solid var(--line);font-weight:700;font-size:13.5px}
+.tab.on{background:#123a48;border-color:#3fb8d2;color:#d8f6ff}
+.row{display:flex;gap:6px;align-items:center}
+.lbl{font-size:12px;color:var(--mut);width:46px;flex:none;line-height:1.1}
+.seg{flex:1;display:flex;gap:5px}
+.seg button{flex:1;min-height:40px;border-radius:10px;background:var(--p2);border:1px solid var(--line);font-size:12.5px;font-weight:600;line-height:1.1;padding:2px 3px}
+.seg button.on{background:#123a34;border-color:#2fbfa6;color:#d6fff6}
+#bSwitch{flex:1.3;min-height:46px;border-radius:12px;font-weight:800;font-size:15px;background:#3a1c22;border:1px solid #8a3a46;color:#ffd9de}
+#bSwitch.on{background:linear-gradient(180deg,#2fd7b0,#1e9f84);border-color:#2fd7b0;color:#03140f}
+#bReverse,#bLift{flex:1;min-height:46px;border-radius:12px;background:var(--p2);border:1px solid var(--line);font-weight:700;font-size:13px;line-height:1.1}
+#bLift.down{background:#2a2a12;border-color:#c9a53a;color:#fff3c8}
+#bRecord{min-height:48px;border-radius:12px;background:linear-gradient(180deg,#5ab8ff,#2f7fd6);color:#04101e;font-weight:800;font-size:16px;flex:1}
+.hide{display:none!important}
+#sheet{position:fixed;inset:0;background:rgba(3,6,10,.62);display:none;align-items:flex-end;justify-content:center;z-index:10}
+#sheet.on{display:flex}
+#sheetBox{background:var(--panel);border:1px solid var(--line);border-radius:18px 18px 0 0;width:min(100%,560px);max-height:82%;overflow:auto;padding:14px 14px calc(16px + env(safe-area-inset-bottom))}
+#sheetBox h2{margin:0 0 10px;font-size:18px}
+.task{display:flex;gap:10px;align-items:center;width:100%;text-align:left;background:var(--p2);border:1px solid var(--line);border-radius:12px;padding:10px;margin-bottom:8px;min-height:52px}
+.task .st{margin-left:auto;color:var(--gold);white-space:nowrap;font-size:14px}
+.task.done{border-color:#2a7a6a}
+.card{background:var(--p2);border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin-bottom:8px}
+.card h3{margin:0 0 4px;font-size:15px;color:#bfeaff}
+.card p{margin:0;font-size:14px;color:#d5dee8}
+.cardBtn{width:100%;text-align:left;background:var(--p2);border:1px solid var(--line);border-radius:12px;padding:11px 12px;margin-bottom:6px;font-weight:600}
+.close{width:100%;min-height:46px;border-radius:12px;background:#1a2738;border:1px solid var(--line);font-weight:700;margin-top:6px}
+#tbl{width:100%;border-collapse:collapse;font-size:13px;margin-bottom:8px}
+#tbl th,#tbl td{border:1px solid var(--line);padding:4px 6px;text-align:center}
+#tbl th{color:var(--mut);font-weight:600}
+#intro{position:fixed;inset:0;z-index:20;background:radial-gradient(120% 80% at 50% 20%,#15283c 0%,#0b111a 70%);display:flex;align-items:center;justify-content:center;padding:18px;overflow:auto}
+#introBox{max-width:470px;width:100%}
+#introBox h1{font-size:30px;margin:0 0 6px;letter-spacing:.4px}
+#introBox h1 b{color:var(--acc)}
+#introBox p{color:#c6d2df;margin:0 0 10px}
+#introBox ul{margin:0 0 14px;padding-left:18px;color:#c6d2df}
+#bStart{width:100%;min-height:54px;border-radius:14px;background:linear-gradient(180deg,#3fd2c7,#1f9a96);color:#03140f;font-size:17px;font-weight:800}
+.safety{font-size:12.5px;color:#ffd9a8;border:1px solid #6a4a22;background:#22180c;border-radius:10px;padding:7px 10px;margin-bottom:12px}
+#nbPane{display:none;font-size:13px;color:#c9d5e1}
+#nbPane h4{margin:6px 0;font-size:13px;color:var(--mut);font-weight:600;text-transform:uppercase;letter-spacing:.6px}
+#nbPane div{background:var(--p2);border:1px solid var(--line);border-radius:10px;padding:7px 9px;margin-bottom:6px}
+@media (max-width:600px){.brand{display:none}}
+@media (min-width:900px) and (min-aspect-ratio:1/1){
+  #app{flex-direction:row}
+  #panel{width:370px;border-top:0;border-left:1px solid var(--line);overflow:auto;justify-content:flex-start;gap:9px}
+  #taskTxt{font-size:14.5px}
+  #nbPane{display:block}
+  #toast{bottom:18px}
+}
+</style></head>
+<body>
+<div id="app">
+  <div id="stage">
+    <canvas id="cv"></canvas>
+    <div id="top">
+      <div class="brand">Electro<b>magnet</b></div>
+      <div id="taskCard"><div id="taskTxt">Pick a task</div><button class="ib" id="bHint" aria-label="Hint">Hint</button></div>
+      <button class="ib" id="bTasks" aria-label="Tasks">&#9776;</button>
+    </div>
+    <div id="readout"></div>
+    <div id="clipBadge"><small>clips lifted</small><b id="clipN">0</b></div>
+    <div id="toast"></div>
+  </div>
+  <div id="panel">
+    <div class="tabs"><button class="tab on" id="tabWire">Wire + compass</button><button class="tab" id="tabEm">Electromagnet</button></div>
+    <div class="row"><button id="bSwitch">Switch OFF</button><button id="bReverse">Reverse the cells</button></div>
+    <div class="row"><span class="lbl">Cells</span><div class="seg" id="segCells"></div></div>
+    <div id="emUI" class="hide" style="display:flex;flex-direction:column;gap:7px">
+      <div class="row"><span class="lbl">Turns</span><div class="seg" id="segTurns"></div></div>
+      <div class="row"><span class="lbl">Core</span><div class="seg" id="segCore"></div></div>
+    </div>
+    <div class="row"><button id="bLift" class="hide">Lower to the clips</button><button id="bRecord">Record</button></div>
+    <div class="row"><button class="ib" id="bCards" style="min-height:44px;flex:1">Cards</button><button class="ib" id="bMusic" style="min-height:44px" aria-label="Music">&#9835;</button><button class="ib" id="bExit" style="min-height:44px">Exit</button></div>
+    <div id="nbPane"><h4>Notebook</h4><p style="margin:0;color:var(--mut)">Press Record to note what you see.</p></div>
+  </div>
+</div>
+<div id="sheet"><div id="sheetBox"></div></div>
+<div id="intro"><div id="introBox">
+  <h1>Electro<b>magnet</b> Bench</h1>
+  <p>Can we use electric current to make a magnet? Close the circuit, choose the turns, the cells and the core, and watch the compass and the iron paper clips.</p>
+  <ul><li>Wire + compass: a wire stretched over a magnetic compass, a cell holder and a switch.</li><li>Electromagnet: a paper-tube coil (25 to 100 turns), an iron nail or other core, 1 to 4 cells, two compasses at ends A and B, and a dish of iron paper clips.</li><li>6 tasks, in any order. Press Record to note what you see.</li></ul>
+  <div class="safety">In a real lab, do not keep the wires connected to the cell for more than a few seconds; otherwise, the cell may weaken quickly.</div>
+  <button id="bStart">Start the lab</button>
+</div></div>
+<script src="zq-telemetry.js"></script><script src="zq-sim-round.js"></script>
+<script>
+// ONE STANDARD s10: a standalone sim = a round game (sim_round adapter 1.0). Tasks = rounds; the page only calls task/act/hint/retry/done/fail/end.
+var TASKS = [
+  { id: 'wire_deflect', level: 1, title: 'Current and the compass', text: 'Wire + compass: close the switch and Record what the compass needle does. Then open the switch and Record again.' },
+  { id: 'wire_reverse', level: 2, title: 'Reverse the deflection', text: 'Wire + compass: with the switch ON, Record the deflection. Then reverse the cells and Record the deflection again.' },
+  { id: 'coil_core', level: 2, title: 'Coil, then iron nail', text: 'Electromagnet: with no core in the paper tube, switch ON and Record the compass deflection. Insert the iron nail, keep the rest the same, and Record again.' },
+  { id: 'lift_clips', level: 1, title: 'Lift the clips', text: 'Electromagnet: with the iron nail, lower the coil to the clips, switch ON and lift. Record the clips it holds. Then switch OFF and Record again.' },
+  { id: 'stronger', level: 3, title: 'Make it stronger', text: 'Electromagnet with the iron nail: Record the clips lifted. Find out how the number of turns, and the number of cells, change it (change one thing at a time).' },
+  { id: 'find_poles', level: 2, title: 'Find the poles', text: 'Electromagnet: switch ON and Record which pole of each compass points to ends A and B. Then reverse the cells and Record again.' }
+];
+var S = ZQSim.start({ content: { board: 'CBSE', class: 8, subject: 'SCI', chapter_id: 'CB-C8-SCI-04', chapter: 'Electricity: Magnetic and Heating Effects',
+                                content_id: 'CB-C8-SCI-04-GAME-ELECTROMAGNET', content_version: '1.0' }, tasks: TASKS });
+window.__S = S; window.__TASKS = TASKS;
+</script>
+<script src="three.js"></script><script src="app.js"></script>
+</body></html>

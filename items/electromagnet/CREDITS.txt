@@ -1,0 +1,2 @@
+Bench, coil, nails, compass and sounds are built in code by ZetaQ. No photos or outside models.
+Software: three.js (MIT licence).

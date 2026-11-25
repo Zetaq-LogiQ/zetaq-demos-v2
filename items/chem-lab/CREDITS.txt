@@ -1,0 +1,2 @@
+Glassware, liquids, reactions and music are made in code by ZetaQ. No photos or outside models.
+Software: three.js (MIT licence, Copyright 2010-2024 Three.js Authors) with addons OrbitControls, RoomEnvironment (MIT).

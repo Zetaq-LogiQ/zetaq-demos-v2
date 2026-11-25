@@ -1,0 +1,360 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#0d1418">
+<style>html,body{overscroll-behavior:none;-webkit-text-size-adjust:100%}</style>
+<title>Circuit Lab</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Figtree:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+/* Workshop at night: the pulley rig fills the screen, one control dock along the bottom (load | the rule | pull). */
+:root {
+  --bg: #0d1418; --glass: rgba(18, 28, 34, .86); --line: rgba(150, 190, 200, .2);
+  --ink: #edf4f2; --muted: #93a8ab; --effort: #ffb13b; --load: #62c9ff; --ok: #4fdc9a; --bad: #ff6b6b;
+  --display: 'Bricolage Grotesque', 'Segoe UI', system-ui, sans-serif;
+  --body: Figtree, 'Segoe UI', system-ui, sans-serif;
+  --mono: 'JetBrains Mono', ui-monospace, Consolas, monospace;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html, body { margin: 0; height: 100%; overflow: hidden; }
+body { background: radial-gradient(1200px 700px at 50% 25%, #1c2b33 0%, var(--bg) 65%); color: var(--ink); font: 16px/1.45 var(--body); }
+button, input { font: inherit; color: inherit; }
+button { cursor: pointer; -webkit-tap-highlight-color: transparent; }
+:focus-visible { outline: 2px solid var(--effort); outline-offset: 2px; }
+.app { position: fixed; inset: 0; }
+#view { position: absolute; inset: 0; width: 100%; height: 100%; display: block; touch-action: none; }
+.labels { position: absolute; inset: 0; pointer-events: none; }
+.lab { position: absolute; transform: translate(-50%, -50%); font: 700 13px var(--body); white-space: nowrap; padding: 3px 9px; border-radius: 8px; background: rgba(13, 20, 24, .82); border: 1px solid var(--line); }
+.lab.e { color: var(--effort); border-color: rgba(255, 177, 59, .5); }
+.lab.l { color: var(--load); border-color: rgba(98, 201, 255, .5); }
+.lab .n { font-family: var(--mono); }
+.badge { position: absolute; transform: translate(-50%, -50%); width: 26px; height: 26px; border-radius: 50%; background: var(--ok); color: #05261a; font: 800 14px/26px var(--mono); text-align: center; box-shadow: 0 0 0 4px rgba(79, 220, 154, .25); }
+.top { position: absolute; left: max(16px, env(safe-area-inset-left, 0px)); right: max(16px, env(safe-area-inset-right, 0px)); top: max(14px, env(safe-area-inset-top, 0px)); display: flex; align-items: flex-start; gap: 20px; flex-wrap: wrap; pointer-events: none; }
+.top h1 { margin: 4px 0 0; font: 800 26px/1 var(--display); letter-spacing: -.5px; }
+.top h1 span { color: var(--effort); }
+.modes { pointer-events: auto; display: flex; flex-wrap: wrap; background: var(--glass); border: 1px solid var(--line); border-radius: 14px; padding: 4px; gap: 4px; backdrop-filter: blur(10px); }
+.modes button { border: 0; background: transparent; border-radius: 10px; padding: 7px 14px; text-align: left; color: var(--muted); }
+.modes button b { display: block; font: 700 14px var(--display); color: var(--ink); }
+.modes button small { font-size: 11.5px; }
+.modes button[aria-pressed="true"] { background: var(--effort); color: #2a1a00; }
+.modes button[aria-pressed="true"] b { color: #2a1a00; }
+.tip { flex-basis: 100%; margin: 0; max-width: 62ch; color: #c6d6d6; font-size: 15px; }
+.dock { position: absolute; left: 50%; transform: translateX(-50%); bottom: max(14px, env(safe-area-inset-bottom, 0px)); width: min(1120px, calc(100% - 32px)); display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr) minmax(0, 1fr); background: var(--glass); border: 1px solid var(--line); border-radius: 20px; backdrop-filter: blur(14px); box-shadow: 0 18px 50px rgba(0, 0, 0, .45); }
+.cell { padding: 14px 18px; min-width: 0; display: grid; gap: 10px; align-content: center; }
+.cell + .cell { border-left: 1px solid var(--line); }
+.k { font-size: 11px; font-weight: 700; letter-spacing: .9px; text-transform: uppercase; color: var(--muted); }
+.ctl { display: grid; gap: 4px; }
+.ctl .row { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; }
+.ctl label { font-weight: 600; font-size: 15px; }
+.ctl output { font: 700 15px var(--mono); }
+.sub { font-size: 13px; color: var(--muted); font-family: var(--mono); }
+input[type=range] { width: 100%; height: 30px; margin: 0; background: transparent; -webkit-appearance: none; appearance: none; }
+input[type=range]::-webkit-slider-runnable-track { height: 6px; border-radius: 3px; background: rgba(255, 255, 255, .14); }
+input[type=range]::-moz-range-track { height: 6px; border-radius: 3px; background: rgba(255, 255, 255, .14); }
+input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 26px; height: 26px; margin-top: -10px; border-radius: 50%; background: var(--ink); border: 4px solid var(--c, var(--effort)); }
+input[type=range]::-moz-range-thumb { width: 18px; height: 18px; border-radius: 50%; background: var(--ink); border: 4px solid var(--c, var(--effort)); }
+.rule { font: 700 15px var(--body); }
+.rule .g { color: var(--ok); }
+.calc { font: 500 14px/1.6 var(--mono); overflow-wrap: anywhere; }
+.calc b { color: var(--effort); }
+.note { font-size: 13.5px; color: #c6d6d6; }
+.big { font: 800 24px/1.1 var(--display); letter-spacing: -.3px; }
+.big .n { font-family: var(--mono); font-weight: 700; color: var(--ok); }
+.pill { justify-self: start; font-weight: 700; font-size: 14px; padding: 5px 11px; border-radius: 999px; }
+.pill.ok { background: rgba(79, 220, 154, .15); color: var(--ok); }
+.pill.bad { background: rgba(255, 107, 107, .15); color: var(--bad); }
+.push { height: 54px; border-radius: 15px; border: 0; background: var(--effort); color: #2a1a00; font: 800 17px var(--display); user-select: none; -webkit-user-select: none; touch-action: none; }
+.push.on { background: #ffd08a; transform: translateY(1px); }
+.moved { font-size: 14px; color: var(--muted); min-height: 1.3em; }
+.moved b { font-family: var(--mono); color: var(--ink); }
+@media (max-width: 860px) {
+  .dock { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+  .cell.eq { grid-column: 1 / -1; order: 3; border-left: 0; border-top: 1px solid var(--line); padding-block: 10px; }
+  .cell.go { border-left: 1px solid var(--line); }
+}
+@media (max-width: 560px) {
+  .top h1 { font-size: 21px; }
+  .modes button { padding: 6px 8px; } .modes button small { display: none; }
+  .tip { font-size: 13.5px; }
+  .dock { grid-template-columns: minmax(0, 1fr); border-radius: 16px; }
+  .cell { padding: 10px 14px; gap: 6px; }
+  .cell.go { border-left: 0; border-top: 1px solid var(--line); order: 2; }
+  .cell.eq { display: none; }
+  .big { font-size: 19px; } .push { height: 48px; } .lab { font-size: 11px; }
+}
+.tray { display: grid; grid-template-columns: repeat(auto-fill, minmax(104px, 1fr)); gap: 6px; }
+.tray button { border: 1px solid var(--line); background: rgba(255, 255, 255, .05); border-radius: 10px; padding: 7px 8px; font-size: 13.5px; font-weight: 600; text-align: left; display: flex; align-items: center; gap: 6px; min-width: 0; }
+.tray button i { width: 10px; height: 10px; border-radius: 3px; flex: none; background: var(--sw); }
+.tray button[aria-pressed="true"] { border-color: var(--effort); background: rgba(255, 177, 59, .14); }
+.tray button .t { font-family: var(--mono); font-size: 12px; margin-left: auto; }
+.tray button .t.c { color: var(--ok); } .tray button .t.i { color: var(--bad); }
+.state { font: 700 16px var(--body); }
+.state.on { color: var(--ok); } .state.off { color: var(--bad); }
+.res { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 13.5px; }
+.res b { display: block; font-size: 11px; letter-spacing: .8px; text-transform: uppercase; margin-bottom: 3px; }
+.res .c b { color: var(--ok); } .res .i b { color: var(--bad); }
+.res span { color: #c6d6d6; }
+.push.off { background: rgba(255, 255, 255, .08); color: var(--ink); border: 1px solid var(--line); }
+#view { cursor: default; }
+</style>
+</head>
+<body>
+<div class="app">
+  <canvas id="view" aria-label="A simple circuit with cells, a switch, a bulb and a testing gap"></canvas>
+  <header class="top">
+    <h1>Circuit <span>Lab</span></h1>
+    <div class="modes" id="modes" role="group" aria-label="Number of cells"></div>
+    <p class="tip">Put something in the gap between the clips and switch on. If the bulb glows, the thing lets electricity through: it is a <b>conductor</b>. If not, it is an <b>insulator</b>.</p>
+  </header>
+  <section class="dock">
+    <div class="cell">
+      <div class="k">Put in the gap</div>
+      <div class="tray" id="tray"></div>
+    </div>
+    <div class="cell eq">
+      <div class="k">Is the loop complete?</div>
+      <div class="state" id="state"></div>
+      <div class="note" id="why"></div>
+      <div class="note">Current flows out of the <b>+</b> end of the cell, round the loop, and back into the <b>−</b> end. Any break stops it everywhere.</div>
+    </div>
+    <div class="cell go">
+      <button class="push" id="sw">Switch ON</button>
+      <div class="k">Your results</div>
+      <div class="res"><div class="c"><b>Conductors</b><span id="resC">none yet</span></div><div class="i"><b>Insulators</b><span id="resI">none yet</span></div></div>
+    </div>
+  </section>
+</div>
+
+<script>
+(() => {
+  'use strict';
+  // what each thing is made of, and how well it conducts (1 = metal, 0 = insulator)
+  const THINGS = [
+    { id: 'nail', name: 'Iron nail', k: 1, sw: '#9aa6b2', why: 'Iron is a metal. Metals are good conductors.' },
+    { id: 'copper', name: 'Copper wire', k: 1, sw: '#d9844a', why: 'Copper is a metal. That is why wires are made of it.' },
+    { id: 'foil', name: 'Aluminium foil', k: 1, sw: '#d6dde4', why: 'Aluminium is a metal, so it conducts.' },
+    { id: 'coin', name: 'Metal coin', k: 1, sw: '#c2c8cf', why: 'Coins are made of metal, so they conduct.' },
+    { id: 'lead', name: 'Pencil lead', k: 0.35, sw: '#4a4f57', why: 'Pencil lead is graphite (a form of carbon). It conducts, but not as well as metals, so the bulb glows dimly.' },
+    { id: 'rubber', name: 'Rubber band', k: 0, sw: '#d8534a', why: 'Rubber is an insulator. Electricians’ gloves are made of it.' },
+    { id: 'ruler', name: 'Plastic ruler', k: 0, sw: '#5aa9e6', why: 'Plastic is an insulator. Wires are covered in plastic for safety.' },
+    { id: 'wood', name: 'Wooden stick', k: 0, sw: '#a8743f', why: 'Dry wood is an insulator.' },
+    { id: 'glass', name: 'Glass rod', k: 0, sw: '#a9e2ee', why: 'Glass is an insulator.' },
+    { id: 'paper', name: 'Paper strip', k: 0, sw: '#f1ede2', why: 'Dry paper is an insulator.' },
+  ];
+  const state = { cells: 2, on: false, thing: null, results: {} };
+  const byId = (id) => THINGS.find((t) => t.id === id);
+
+  // ------------------------------------------------------------------ geometry (logical 1000 x 560 board)
+  const BW = 1000, BH = 560;
+  const X0 = 170, X1 = 830, Y0 = 110, Y1 = 450;        // the loop's corners
+  const CELL_H = 74, CELL_W = 40;
+  const SW_A = 380, SW_B = 470;                          // switch terminals on the top wire
+  const BULB_A = 235, BULB_B = 325;                      // bulb holder terminals on the right wire
+  const CLIP_L = 400, CLIP_R = 600, JAW_L = 476, JAW_R = 524;   // crocodile clips on the bottom wire
+  const cellsTop = () => 280 - (state.cells * CELL_H) / 2, cellsBot = () => 280 + (state.cells * CELL_H) / 2;
+  // inside the bulb: in through the top contact, across the filament, out through the bottom contact
+  const bulbPath = () => { const bx = X1 + 70, by = (BULB_A + BULB_B) / 2; return [[X1 + 16, BULB_A + 10], [bx - 22, by - 8], [bx - 10, by - 14], [bx + 10, by - 14], [bx - 22, by + 8], [X1 + 16, BULB_B - 10]]; };
+  // the loop, in the direction the current flows: out of + (top of the cells), clockwise, back into −
+  const loop = () => [[X0, cellsTop()], [X0, Y0], [SW_A, Y0], [SW_B, Y0], [X1, Y0], [X1, BULB_A], ...bulbPath(), [X1, BULB_B], [X1, Y1], [CLIP_R, Y1], [JAW_R, Y1], [JAW_L, Y1], [CLIP_L, Y1], [X0, Y1], [X0, cellsBot()], [X0, cellsTop()]];   // last stretch: through the cells, back to +
+
+  const canvas = document.getElementById('view'), ctx = canvas.getContext('2d');
+  let view = { s: 1, ox: 0, oy: 0 }, dpr = 1;
+  function resize() {
+    dpr = Math.min(2, window.devicePixelRatio || 1);
+    const r = canvas.getBoundingClientRect();
+    canvas.width = Math.round(r.width * dpr); canvas.height = Math.round(r.height * dpr);
+    const topH = document.querySelector('.top').getBoundingClientRect().bottom, dockTop = document.querySelector('.dock').getBoundingClientRect().top;
+    const availH = Math.max(200, dockTop - topH - 16), availW = r.width - 24;
+    view.s = Math.min(availW / BW, availH / BH);
+    view.ox = (r.width - BW * view.s) / 2; view.oy = topH + 8 + (availH - BH * view.s) / 2;
+  }
+  window.addEventListener('resize', resize);
+  if (window.ResizeObserver) new ResizeObserver(() => resize()).observe(document.querySelector('.dock'));
+
+  // ------------------------------------------------------------------ drawing helpers
+  const C = { wire: '#e8a23a', wireEdge: '#6b4612', ink: '#edf4f2', muted: '#93a8ab', glass: 'rgba(200,230,255,.18)' };
+  function wire(pts) {
+    ctx.lineJoin = 'round'; ctx.lineCap = 'round';
+    for (const [w, c] of [[9, C.wireEdge], [5, C.wire]]) { ctx.strokeStyle = c; ctx.lineWidth = w; ctx.beginPath(); pts.forEach(([x, y], i) => (i ? ctx.lineTo(x, y) : ctx.moveTo(x, y))); ctx.stroke(); }
+  }
+  const dot = (x, y, r, c) => { ctx.fillStyle = c; ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); ctx.fill(); };
+  function text(t, x, y, o = {}) { ctx.font = `${o.w || 700} ${o.size || 15}px ${o.mono ? 'JetBrains Mono, monospace' : 'Figtree, sans-serif'}`; ctx.fillStyle = o.c || C.ink; ctx.textAlign = o.align || 'center'; ctx.textBaseline = 'middle'; ctx.fillText(t, x, y); }
+
+  function drawCells() {
+    for (let i = 0; i < state.cells; i++) {
+      const top = cellsTop() + i * CELL_H, x = X0 - CELL_W / 2;
+      // body (− end at the bottom), + nub at the top
+      ctx.fillStyle = '#2c3a44'; ctx.fillRect(x, top + 8, CELL_W, CELL_H - 8);
+      ctx.fillStyle = '#3f8f6b'; ctx.fillRect(x, top + 8, CELL_W, (CELL_H - 8) * 0.45);
+      ctx.fillStyle = '#c9d1d8'; ctx.fillRect(X0 - 8, top, 16, 8);
+      ctx.strokeStyle = '#0d1418'; ctx.lineWidth = 2; ctx.strokeRect(x, top + 8, CELL_W, CELL_H - 8);
+      text('+', X0, top + 22, { size: 18, c: '#e9fff4' });
+      text('−', X0, top + CELL_H - 12, { size: 18, c: '#c9d1d8' });
+      text('1.5 V', X0 - CELL_W / 2 - 34, top + CELL_H / 2 + 4, { size: 13, mono: true, c: C.muted });
+    }
+    text(state.cells === 1 ? 'Cell' : 'Cells', X0 - 70, cellsTop() - 12, { size: 14, c: C.muted });
+  }
+  function drawSwitch() {
+    // two brass studs on a base; the lever is hinged on the left stud
+    ctx.fillStyle = '#3a2a1a'; ctx.fillRect(SW_A - 18, Y0 + 6, SW_B - SW_A + 36, 16);
+    dot(SW_A, Y0, 9, '#c9a24b'); dot(SW_B, Y0, 9, '#c9a24b');
+    const ang = state.on ? 0 : -0.55, len = SW_B - SW_A + 6;
+    ctx.strokeStyle = '#dfe6ec'; ctx.lineWidth = 7; ctx.lineCap = 'round';
+    ctx.beginPath(); ctx.moveTo(SW_A, Y0); ctx.lineTo(SW_A + Math.cos(ang) * len, Y0 + Math.sin(ang) * len); ctx.stroke();
+    dot(SW_A, Y0, 5, '#6b4a2b');
+    text(state.on ? 'Switch ON (closed)' : 'Switch OFF (open)', (SW_A + SW_B) / 2, Y0 + 44, { size: 14, c: state.on ? '#4fdc9a' : '#ff6b6b' });
+  }
+  function drawBulb(glow) {
+    // holder on the wire, bulb sticking out to the right
+    ctx.fillStyle = '#3b4650'; ctx.fillRect(X1 - 16, BULB_A - 6, 32, BULB_B - BULB_A + 12);
+    dot(X1, BULB_A, 7, '#c9a24b'); dot(X1, BULB_B, 7, '#c9a24b');
+    const bx = X1 + 70, by = (BULB_A + BULB_B) / 2;
+    if (glow > 0) {
+      const g = ctx.createRadialGradient(bx, by - 6, 4, bx, by - 6, 150 * glow + 30);
+      g.addColorStop(0, `rgba(255,230,140,${0.85 * glow})`); g.addColorStop(1, 'rgba(255,200,80,0)');
+      ctx.fillStyle = g; ctx.beginPath(); ctx.arc(bx, by - 6, 150 * glow + 30, 0, Math.PI * 2); ctx.fill();
+    }
+    // inner wires from the two holder contacts to the filament (part of the loop)
+    ctx.strokeStyle = '#b8c2cc'; ctx.lineWidth = 2.5;
+    ctx.beginPath(); ctx.moveTo(X1 + 16, BULB_A + 10); ctx.lineTo(bx - 22, by - 8); ctx.lineTo(bx - 10, by - 14); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(X1 + 16, BULB_B - 10); ctx.lineTo(bx - 22, by + 8); ctx.lineTo(bx + 10, by - 14); ctx.stroke();
+    // base and glass
+    ctx.fillStyle = '#9aa3ad'; ctx.fillRect(X1 + 16, BULB_A + 4, 26, BULB_B - BULB_A - 8);
+    ctx.fillStyle = glow > 0 ? `rgba(255,236,170,${0.25 + 0.5 * glow})` : C.glass;
+    ctx.strokeStyle = 'rgba(220,240,255,.7)'; ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.ellipse(bx + 6, by - 6, 40, 44, 0, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+    // filament
+    ctx.strokeStyle = glow > 0 ? `rgb(255,${200 + 55 * glow},${120 + 100 * glow})` : '#5b6570'; ctx.lineWidth = glow > 0 ? 3 : 2;
+    ctx.beginPath(); ctx.moveTo(bx - 10, by - 14);
+    for (let i = 0; i <= 8; i++) ctx.lineTo(bx - 10 + i * 2.5, by - 14 - (i % 2 ? 7 : 0));
+    ctx.lineTo(bx + 10, by - 14); ctx.stroke();
+    text('Bulb', bx + 6, by + 58, { size: 14, c: C.muted });
+  }
+  function drawClip(x0, x1, red) {
+    // a crocodile clip from the wire end (x0) to its jaws (x1)
+    const dir = Math.sign(x1 - x0);
+    ctx.fillStyle = red ? '#c8423a' : '#2b2f36'; ctx.strokeStyle = '#0d1418'; ctx.lineWidth = 1.5;
+    ctx.beginPath(); ctx.moveTo(x0, Y1 - 9); ctx.lineTo(x0 + dir * 40, Y1 - 11); ctx.lineTo(x0 + dir * 40, Y1 + 11); ctx.lineTo(x0, Y1 + 9); ctx.closePath(); ctx.fill(); ctx.stroke();
+    ctx.fillStyle = '#c0c7ce';
+    ctx.beginPath(); ctx.moveTo(x0 + dir * 40, Y1 - 10); ctx.lineTo(x1, Y1 - 3); ctx.lineTo(x0 + dir * 40, Y1 - 1); ctx.closePath(); ctx.fill();
+    ctx.beginPath(); ctx.moveTo(x0 + dir * 40, Y1 + 10); ctx.lineTo(x1, Y1 + 3); ctx.lineTo(x0 + dir * 40, Y1 + 1); ctx.closePath(); ctx.fill();
+  }
+  function drawThing(t) {
+    const cx = (JAW_L + JAW_R) / 2, y = Y1;
+    ctx.save();
+    if (!t) { text('gap', cx, y + 30, { size: 14, c: C.muted }); ctx.restore(); return; }
+    const L = 150, x0 = cx - L / 2;
+    switch (t.id) {
+      case 'nail': ctx.fillStyle = '#9aa6b2'; ctx.fillRect(x0, y - 4, L - 12, 8); ctx.beginPath(); ctx.moveTo(x0 + L - 12, y - 4); ctx.lineTo(x0 + L, y); ctx.lineTo(x0 + L - 12, y + 4); ctx.fill(); ctx.fillRect(x0 - 6, y - 11, 7, 22); break;
+      case 'copper': ctx.strokeStyle = '#d9844a'; ctx.lineWidth = 4; ctx.beginPath(); ctx.moveTo(x0, y); for (let i = 0; i <= 30; i++) ctx.lineTo(x0 + i * L / 30, y + Math.sin(i * 0.9) * 2); ctx.stroke(); break;
+      case 'foil': ctx.fillStyle = '#d6dde4'; ctx.beginPath(); ctx.moveTo(x0, y - 8); for (let i = 1; i <= 10; i++) ctx.lineTo(x0 + i * L / 10, y - 8 + (i % 2 ? 3 : -2)); ctx.lineTo(x0 + L, y + 8); for (let i = 9; i >= 0; i--) ctx.lineTo(x0 + i * L / 10, y + 8 + (i % 2 ? -2 : 3)); ctx.fill(); break;
+      case 'coin': ctx.fillStyle = '#c2c8cf'; ctx.beginPath(); ctx.arc(cx, y, 34, 0, Math.PI * 2); ctx.fill(); ctx.strokeStyle = '#8b939c'; ctx.lineWidth = 3; ctx.beginPath(); ctx.arc(cx, y, 28, 0, Math.PI * 2); ctx.stroke(); text('₹2', cx, y + 1, { size: 16, c: '#5c646d' }); break;
+      case 'lead': ctx.fillStyle = '#4a4f57'; ctx.fillRect(x0, y - 3, L, 6); ctx.fillStyle = '#777e88'; ctx.fillRect(x0, y - 3, L, 2); break;
+      case 'rubber': ctx.strokeStyle = '#d8534a'; ctx.lineWidth = 5; ctx.beginPath(); ctx.ellipse(cx, y, L / 2, 9, 0, 0, Math.PI * 2); ctx.stroke(); break;
+      case 'ruler': ctx.fillStyle = 'rgba(90,169,230,.75)'; ctx.fillRect(x0, y - 10, L, 20); ctx.strokeStyle = '#0d3550'; ctx.lineWidth = 1.5; for (let i = 0; i <= 15; i++) { ctx.beginPath(); ctx.moveTo(x0 + i * 10, y - 10); ctx.lineTo(x0 + i * 10, y - (i % 5 ? 4 : 0)); ctx.stroke(); } break;
+      case 'wood': ctx.fillStyle = '#a8743f'; ctx.fillRect(x0, y - 7, L, 14); ctx.strokeStyle = 'rgba(70,40,15,.6)'; ctx.lineWidth = 1.5; for (let i = 0; i < 4; i++) { ctx.beginPath(); ctx.moveTo(x0 + 8, y - 4 + i * 3); ctx.lineTo(x0 + L - 8, y - 5 + i * 3); ctx.stroke(); } break;
+      case 'glass': ctx.fillStyle = 'rgba(169,226,238,.55)'; ctx.fillRect(x0, y - 6, L, 12); ctx.fillStyle = 'rgba(255,255,255,.7)'; ctx.fillRect(x0 + 4, y - 4, L - 8, 2); break;
+      case 'paper': ctx.fillStyle = '#f1ede2'; ctx.fillRect(x0, y - 12, L, 24); ctx.strokeStyle = 'rgba(90,110,150,.4)'; ctx.lineWidth = 1; for (let i = 0; i < 3; i++) { ctx.beginPath(); ctx.moveTo(x0 + 6, y - 6 + i * 6); ctx.lineTo(x0 + L - 6, y - 6 + i * 6); ctx.stroke(); } break;
+    }
+    ctx.restore();
+    text(t.name, cx, y + 50, { size: 14, c: C.ink });
+  }
+
+  // ------------------------------------------------------------------ the circuit's state
+  const brightness = () => {
+    if (!state.on || !state.thing) return 0;
+    const k = byId(state.thing).k;
+    return k === 0 ? 0 : k * (state.cells === 1 ? 0.55 : 1);
+  };
+  // current dots: distance travelled along the loop
+  let flow = 0;
+  function pointAt(d, pts) {
+    for (let i = 1; i < pts.length; i++) {
+      const [ax, ay] = pts[i - 1], [bx, by] = pts[i], seg = Math.hypot(bx - ax, by - ay);
+      if (d <= seg) return [ax + (bx - ax) * d / seg, ay + (by - ay) * d / seg];
+      d -= seg;
+    }
+    return pts[pts.length - 1];
+  }
+  const loopLen = (pts) => pts.reduce((s, p, i) => (i ? s + Math.hypot(p[0] - pts[i - 1][0], p[1] - pts[i - 1][1]) : 0), 0);
+
+  // ------------------------------------------------------------------ controls
+  const $ = (id) => document.getElementById(id);
+  function drawModes() {
+    $('modes').innerHTML = [1, 2].map((n) => `<button type="button" data-n="${n}" aria-pressed="${state.cells === n}"><b>${n} cell${n > 1 ? 's' : ''}</b><small>${(1.5 * n).toFixed(1)} V</small></button>`).join('');
+    $('modes').querySelectorAll('button').forEach((b) => { b.onclick = () => { state.cells = +b.dataset.n; drawModes(); update(); }; });
+  }
+  function drawTray() {
+    $('tray').innerHTML = THINGS.map((t) => {
+      const r = state.results[t.id];
+      return `<button type="button" data-t="${t.id}" aria-pressed="${state.thing === t.id}" style="--sw:${t.sw}"><i></i>${t.name}${r ? `<span class="t ${r}">${r === 'c' ? '✓' : '✗'}</span>` : ''}</button>`;
+    }).join('');
+    $('tray').querySelectorAll('button').forEach((b) => { b.onclick = () => { state.thing = state.thing === b.dataset.t ? null : b.dataset.t; update(); }; });
+  }
+  $('sw').onclick = () => { state.on = !state.on; update(); };
+  canvas.addEventListener('pointerdown', (e) => {
+    const r = canvas.getBoundingClientRect(), x = (e.clientX - r.left - view.ox) / view.s, y = (e.clientY - r.top - view.oy) / view.s;
+    if (x > SW_A - 30 && x < SW_B + 30 && y > Y0 - 70 && y < Y0 + 30) { state.on = !state.on; update(); }
+  });
+  canvas.addEventListener('pointermove', (e) => {
+    const r = canvas.getBoundingClientRect(), x = (e.clientX - r.left - view.ox) / view.s, y = (e.clientY - r.top - view.oy) / view.s;
+    canvas.style.cursor = x > SW_A - 30 && x < SW_B + 30 && y > Y0 - 70 && y < Y0 + 30 ? 'pointer' : 'default';
+  });
+
+  function update() {
+    const t = state.thing ? byId(state.thing) : null;
+    if (state.on && t) state.results[t.id] = t.k > 0 ? 'c' : 'i';
+    const sw = $('sw'); sw.textContent = state.on ? 'Switch OFF' : 'Switch ON'; sw.classList.toggle('off', state.on);
+    const st = $('state'), why = $('why');
+    if (!state.on) { st.className = 'state off'; st.textContent = 'No: the switch is open'; why.textContent = 'An open switch makes a gap in the loop. Close it to test.'; }
+    else if (!t) { st.className = 'state off'; st.textContent = 'No: there is a gap between the clips'; why.textContent = 'Air does not let current through. Put something in the gap.'; }
+    else if (t.k === 0) { st.className = 'state off'; st.textContent = `No: the ${t.name.toLowerCase()} stops the current`; why.textContent = t.why; }
+    else { st.className = 'state on'; st.textContent = t.k < 1 ? 'Yes, the bulb glows dimly' : `Yes, the bulb glows${state.cells === 1 ? ' (dim with one cell)' : ''}`; why.textContent = t.why + (state.cells === 1 && t.k === 1 ? ' Add a second cell for a brighter bulb.' : ''); }
+    const list = (k) => THINGS.filter((x) => state.results[x.id] === k).map((x) => x.name).join(', ') || 'none yet';
+    $('resC').textContent = list('c'); $('resI').textContent = list('i');
+    drawTray();
+  }
+
+  // ------------------------------------------------------------------ frame loop
+  let last = performance.now();
+  function frame(now) {
+    requestAnimationFrame(frame);
+    const dt = Math.min(0.05, (now - last) / 1000); last = now;
+    const glow = brightness(), pts = loop(), len = loopLen(pts);
+    const gap = len / Math.round(len / 32);   // even spacing all the way round
+    flow = (flow + dt * 90 * glow) % gap;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.setTransform(dpr * view.s, 0, 0, dpr * view.s, dpr * view.ox, dpr * view.oy);
+    // board
+    ctx.fillStyle = 'rgba(30,44,52,.6)'; ctx.strokeStyle = 'rgba(150,190,200,.15)'; ctx.lineWidth = 1.5;
+    ctx.beginPath(); ctx.roundRect ? ctx.roundRect(40, 30, BW - 80, BH - 40, 24) : ctx.rect(40, 30, BW - 80, BH - 40); ctx.fill(); ctx.stroke();
+    // wires (each one ends exactly on a terminal)
+    wire([[X0, cellsTop()], [X0, Y0], [SW_A, Y0]]);
+    wire([[SW_B, Y0], [X1, Y0], [X1, BULB_A]]);
+    wire([[X1, BULB_B], [X1, Y1], [CLIP_R, Y1]]);
+    wire([[CLIP_L, Y1], [X0, Y1], [X0, cellsBot()]]);
+    drawCells(); drawSwitch(); drawBulb(glow);
+    drawThing(state.thing ? byId(state.thing) : null);
+    drawClip(CLIP_L, JAW_L, true); drawClip(CLIP_R, JAW_R, false);
+    // current: little dots moving round the loop, only when it is complete
+    if (glow > 0) {
+      for (let d = flow; d < len; d += gap) { const [x, y] = pointAt(d, pts); dot(x, y, 4, '#fff6c4'); }
+      text('current →', (SW_B + X1) / 2, Y0 - 22, { size: 14, c: '#fff1a8' });
+    }
+  }
+
+  drawModes(); resize(); update();
+  requestAnimationFrame(frame);
+  window.__circuit = { state, update };
+})();
+</script>
+</body>
+</html>

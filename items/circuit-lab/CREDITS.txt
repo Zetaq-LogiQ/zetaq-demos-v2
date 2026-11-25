@@ -1,0 +1,2 @@
+Circuit bench, parts and sounds are built in code by ZetaQ (ZetaQ Engineering Library). No photos or outside models.
+Software: three.js (MIT licence).

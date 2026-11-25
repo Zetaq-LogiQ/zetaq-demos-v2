@@ -1,0 +1,46 @@
+<!doctype html>
+<!-- © ZetaQ / LogiQ Learning. All rights reserved. Unauthorised copying or hosting prohibited. -->
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+<meta name="robots" content="noindex,nofollow"><meta name="theme-color" content="#14304c"><link rel="icon" href="data:,">
+<title>Neutrophil Chase · ZetaQ</title>
+<style>:root{--ink:#16304a;--ink2:#56708a;--glass:rgba(255,255,255,.86);--blue:#2f6fdb;--gold:#f2a93b;--font:ui-rounded,"SF Pro Rounded",system-ui,-apple-system,"Segoe UI",Roboto,"Noto Sans",sans-serif;--sh:0 1px 2px rgba(10,30,50,.12),0 4px 12px rgba(10,30,50,.25)}*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}html,body{margin:0;height:100%;background:#14304c;color:var(--ink);font:14px/1.3 var(--font);overscroll-behavior:none;-webkit-user-select:none;user-select:none;overflow:hidden}#app{position:fixed;inset:0;overflow:hidden}.scene{position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:none}.vig{position:absolute;inset:0;pointer-events:none;background:radial-gradient(130% 95% at 50% 50%,transparent 60%,rgba(8,20,38,.4))}button{font:inherit;color:inherit;cursor:pointer}.top{position:absolute;top:calc(6px + env(safe-area-inset-top));left:6px;right:6px;display:flex;gap:6px;align-items:center;z-index:3;pointer-events:none}.top>*{pointer-events:auto}.rb{appearance:none;border:0;width:36px;height:36px;flex:0 0 36px;border-radius:50%;display:inline-grid;place-items:center;background:var(--glass);box-shadow:var(--sh);padding:0}.rb svg{width:18px;height:18px}.rb.off{opacity:.45}.chip{flex:1;min-width:0;max-width:520px;margin:0 auto;min-height:36px;background:var(--glass);box-shadow:var(--sh);border-radius:14px;padding:4px 6px 4px 12px;display:flex;align-items:center;gap:8px;font-weight:700;font-size:12.5px;line-height:1.2}.chip span{flex:1;min-width:0;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}#count{flex:0 0 auto;background:#e6f9d2;color:#2c6a0c;border-radius:10px;padding:4px 9px;font-size:13px;font-variant-numeric:tabular-nums;white-space:nowrap}#count.bump{animation:bump .45s}@keyframes bump{30%{transform:scale(1.35);background:#b8f27a}}.arr{position:absolute;left:0;top:0;width:0;height:0;pointer-events:none;z-index:2}.arr:before{content:"";position:absolute;left:-9px;top:-9px;width:0;height:0;border-left:18px solid #b6ff6a;border-top:9px solid transparent;border-bottom:9px solid transparent;filter:drop-shadow(0 0 4px #b6ff6acc) drop-shadow(0 1px 2px #0008)}.arr[hidden]{display:none}#joy{position:absolute;left:0;top:0;width:112px;height:112px;border-radius:50%;border:2px solid rgba(255,255,255,.45);background:#ffffff14;pointer-events:none;z-index:2}#joy[hidden]{display:none}#knob{position:absolute;left:36px;top:36px;width:40px;height:40px;border-radius:50%;background:#ffffff8c;box-shadow:0 1px 4px #0006}.toast{position:absolute;left:50%;top:calc(52px + env(safe-area-inset-top));transform:translate(-50%,-6px);opacity:0;transition:.25s;background:#16304ae0;color:#fff;border-radius:12px;padding:6px 12px;font-weight:700;font-size:13px;max-width:calc(100% - 32px);text-align:center;pointer-events:none;z-index:6}.toast.show{opacity:1;transform:translate(-50%)}.modal,.intro,.loading{position:absolute;inset:0;background:#0a1a2c55;display:flex;align-items:center;justify-content:center;padding:16px;z-index:8}.modal[hidden],.intro[hidden],.loading[hidden]{display:none}.loading{background:#14304c;color:#eaf3ff;font-weight:700}.mcard{position:relative;background:#fff;border-radius:18px;box-shadow:var(--sh);padding:14px;width:min(340px,100%);max-height:calc(100% - 8px);overflow-y:auto}.mcard.small{width:min(280px,100%);text-align:center}.mcard p{margin:0 0 8px;font-size:14px}.note{color:var(--ink2);font-size:12.5px!important}.mh{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px;font-size:16px}.x{border:0;background:#eef3f7;width:34px;height:34px;flex:0 0 34px;border-radius:50%;font-size:20px;line-height:1}.mcard.small .x{position:absolute;right:8px;top:8px}.ti{display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;border:0;background:#f3f7fa;border-radius:12px;padding:10px 12px;margin-bottom:6px;text-align:left;min-height:44px}.ti .st{color:var(--gold);letter-spacing:1px}.ti.cur{outline:2px solid var(--blue)}.txtb{display:block;width:100%;border:0;border-radius:12px;min-height:42px;margin-top:6px;background:#eaf1f6;font-weight:700}.txtb[hidden]{display:none}.intro h1{margin:0 0 6px;font-size:20px}.go{width:100%;min-height:46px;border:0;border-radius:12px;background:var(--blue);color:#fff;font-size:16px;font-weight:800;margin-top:6px}.stars{font-size:28px;color:var(--gold);letter-spacing:4px;margin:4px 0 6px}</style>
+</head><body>
+<div id="app">
+  <canvas id="scene" class="scene"></canvas>
+  <div class="vig"></div>
+  <div class="arr" hidden></div><div class="arr" hidden></div><div class="arr" hidden></div>
+  <div id="joy" hidden><i id="knob"></i></div>
+  <div class="top" id="topbar">
+    <button class="rb" id="bTasks" aria-label="Tasks"><svg viewBox="0 0 24 24"><path d="M5 7h14M5 12h14M5 17h9" stroke="currentColor" stroke-width="2.4" fill="none" stroke-linecap="round"/></svg></button>
+    <div class="chip"><span id="taskText"></span><b id="count">0</b></div>
+    <button class="rb" id="bInfo" aria-label="About"><svg viewBox="0 0 24 24"><circle cx="12" cy="7" r="1.6" fill="currentColor"/><path d="M12 11v7" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg></button>
+    <button class="rb" id="bMusic" aria-label="Music on or off"><svg viewBox="0 0 24 24"><path d="M9 18V6l10-2v12" stroke="currentColor" stroke-width="2" fill="none"/><circle cx="7" cy="18" r="2.4" fill="currentColor"/><circle cx="17" cy="16" r="2.4" fill="currentColor"/></svg></button>
+  </div>
+  <div class="toast" id="toast"></div>
+  <div class="modal" id="list" hidden><div class="mcard"><div class="mh"><b>Tasks</b><button class="x" id="bListX" aria-label="Close">×</button></div><div id="taskList"></div>
+    <button class="txtb" id="bRestart" hidden>Start this task again</button><button class="txtb" id="bExit">Finish and leave</button></div></div>
+  <div class="modal" id="info" hidden><div class="mcard"><div class="mh"><b>Neutrophil</b><button class="x" id="bInfoX" aria-label="Close">×</button></div><div id="infoB"></div></div></div>
+  <div class="modal" id="doneM" hidden><div class="mcard small"><button class="x" id="bDoneX" aria-label="Close">×</button><div class="stars" id="doneS"></div><p id="doneB"></p><button class="go" id="bNext">Next</button></div></div>
+  <div class="intro" id="intro"><div class="mcard small">
+    <h1>Neutrophil Chase</h1><p>Steer the white blood cell and eat the bacteria.</p><p class="note">Drag anywhere to steer, or tap a germ. Keys: arrows / WASD.</p>
+    <button id="bStart" class="go">Start</button></div></div>
+  <div class="loading" id="loading"><p>Loading…</p></div>
+</div>
+<script src="zq-telemetry.js"></script><script src="zq-sim-round.js"></script>
+<script>
+// ONE STANDARD section 10: a standalone sim = a round game (contract 1.0). One task = one round.
+window.addEventListener('pagehide', function () { if (window.__zqEndSim) window.__zqEndSim(); });   // before the kit's own handler
+var TASKS = [
+  { id: 'first_germ', level: 1, text: "Steer to the green bacterium and eat it." },
+  { id: 'eat_five', level: 2, text: "Eat 5 bacteria." },
+  { id: 'clear_infection', level: 3, text: "Germs got in through a cut. Eat them all!" }
+];
+var S = ZQSim.start({ content: { board: 'CBSE', class: 8, subject: 'SCI', chapter_id: 'CB-C8-SCI-03', chapter: "Health: The Ultimate Treasure",
+                                content_id: 'CB-C8-SCI-03-GAME-NEUTROPHIL', content_version: '1.0' },
+                      tasks: TASKS.map(function (t) { return { id: t.id, level: t.level }; }) });
+window.__S = S;
+</script>
+<script src="models.js"></script>
+<script src="app.js"></script>
+</body></html>
